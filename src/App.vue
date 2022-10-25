@@ -30,7 +30,7 @@
             </div>
           </template>
           <div class="card-center" v-if="this.curr >= 0">
-            <span v-if="this.value">{{ this.list[this.curr].value }}</span>
+            <span v-if="this.value">{{ this.list[this.randoms[this.curr]].value }}</span>
           </div>
         </el-card>
       </div>
