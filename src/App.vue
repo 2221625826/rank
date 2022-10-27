@@ -1,6 +1,6 @@
 <template>
   <el-container class="common-layout">
-    <el-aside width="15%" v-if="this.aside">
+    <el-aside v-if="this.aside">
       <el-table :data="list" max-height="85%" height="100%">
         <el-table-column
           prop="name"
@@ -11,6 +11,12 @@
         <el-table-column
           prop="value"
           label="value"
+          header-align="center"
+          align="center"
+        />
+        <el-table-column
+          prop="desc"
+          label="desc"
           header-align="center"
           align="center"
         />
@@ -26,11 +32,12 @@
         <el-card class="card">
           <template #header>
             <div class="card-center" v-if="this.curr >= 0">
-              <span>{{ this.list[this.randoms[this.curr]].name }}</span>
+              <span class="name">{{ this.list[this.randoms[this.curr]].name }}</span>
             </div>
           </template>
           <div class="card-center" v-if="this.curr >= 0">
-            <span v-if="this.value">{{ this.list[this.randoms[this.curr]].value }}</span>
+            <span v-if="this.value" class="value">{{ this.list[this.randoms[this.curr]].value }}</span>
+            <span v-if="this.value" class="desc">{{ this.list[this.randoms[this.curr]].desc }}</span>
           </div>
         </el-card>
       </div>
@@ -116,8 +123,8 @@ export default {
       this.random(temp.length);
       this.list = [];
       for (var i = 0; i < temp.length; i++) {
-        let peer = temp[i].split(" ");
-        this.list.push({ name: peer[0], value: peer[1] });
+        let peer = temp[i].split("\t");
+        this.list.push({ name: peer[0], value: peer[1], desc: peer[2] });
       }
       this.curr = 0;
       this.aside = false;
@@ -185,6 +192,15 @@ li {
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-direction: column;
+}
+.name {
   font-size: 60px;
+}
+.value {
+  font-size: 45px;
+}
+.desc {
+  font-size: 30px;
 }
 </style>
