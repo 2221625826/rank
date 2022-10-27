@@ -45,6 +45,9 @@
           @click="this.aside = !this.aside"
           >收起</el-button
         >
+        <el-button size="large" type="primary" round @click="this.readWord"
+          >发音</el-button
+        >
         <el-button
           size="large"
           type="primary"
@@ -95,6 +98,16 @@ export default {
         this.value = false;
       }
     },
+    readWord() {
+      var word = new SpeechSynthesisUtterance(this.list[this.randoms[this.curr]].name);
+      word.lang = "ja-JP";
+      var voices = window.speechSynthesis.getVoices();
+      word.voice = voices[13];
+      word.rate = 1.1 //播放语速 （默认值是1，范围是0.1到10，表示语速的倍数，例如2表示正常语速的两倍）
+      word.pitch = 1 //音调高低 （范围从0（最小）到2（最大）。默认值为1）
+      //word.volume = 0.5 //播放音量 (区间范围是0到1，默认是1)
+			window.speechSynthesis.speak(word);
+    },
     random(length) {
       this.randoms = [...Array(length).keys()].sort(() => Math.random() - 0.5);
     },
@@ -114,13 +127,21 @@ export default {
     handleKeyup(event){
         const e = event || window.event || arguments.callee.caller.arguments[0]
         if(!e) return
-        const keyCode = e.keyCode;
-        if (keyCode == 37) {
-          this.preWord();
-        } else if(keyCode == 39) {
-          this.nextWord();
-        } else if(keyCode == 32) {
-          this.value = !this.value;
+        switch (e.keyCode) {
+          case 37:
+            this.preWord();
+            break;
+          case 38:
+            this.value = true;
+            break;
+          case 39:
+            this.nextWord();
+            break;
+          case 40:
+            this.value = false;
+            break;
+          default:
+            break;
         }
     },
   },
