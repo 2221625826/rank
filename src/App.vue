@@ -36,8 +36,9 @@
             </div>
           </template>
           <div class="card-center" v-if="this.curr >= 0">
-            <span v-if="this.value" class="value">{{ this.list[this.randoms[this.curr]].value }}</span>
-            <span v-if="this.value" class="desc">{{ this.list[this.randoms[this.curr]].desc }}</span>
+            <span v-if="this.value" class="value" :class="{ 'textColor': this.word != this.list[this.randoms[this.curr]].value}">{{ this.list[this.randoms[this.curr]].value }}</span>
+            <span v-if="this.value" class="desc" :class="{ 'textColor': this.word != this.list[this.randoms[this.curr]].value}">{{ this.list[this.randoms[this.curr]].desc }}</span>
+            <el-input v-if="!this.value" v-model="word" size="large"/>
           </div>
         </el-card>
       </div>
@@ -59,7 +60,7 @@
           size="large"
           type="primary"
           round
-          @click="this.value = !this.value"
+          @click="this.show"
           >显示</el-button
         >
         <el-button size="large" type="primary" round @click="this.nextWord"
@@ -90,6 +91,7 @@ export default {
       input: false,
       curr: -1,
       text: "",
+      word: ""
     };
   },
   methods: {
@@ -130,6 +132,9 @@ export default {
       this.aside = false;
       this.input = false;
       window.addEventListener('keyup',this.handleKeyup);
+    },
+    show() {
+      this.value = !this.value;
     },
     handleKeyup(event){
         const e = event || window.event || arguments.callee.caller.arguments[0]
@@ -202,5 +207,8 @@ li {
 }
 .desc {
   font-size: 30px;
+}
+.textColor{
+  color: red;
 }
 </style>
