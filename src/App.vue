@@ -38,7 +38,7 @@
           <div class="card-center" v-if="this.curr >= 0">
             <span v-if="this.value" class="value" :class="{ 'textColor': this.word != this.list[this.randoms[this.curr]].value}">{{ this.list[this.randoms[this.curr]].value }}</span>
             <span v-if="this.value" class="desc" :class="{ 'textColor': this.word != this.list[this.randoms[this.curr]].value}">{{ this.list[this.randoms[this.curr]].desc }}</span>
-            <el-input v-if="!this.value" v-model="word" size="large"/>
+            <!--<el-input v-if="!this.value" v-model="word" size="large"/>-->
           </div>
         </el-card>
       </div>
@@ -53,9 +53,9 @@
           @click="this.aside = !this.aside"
           >收起</el-button
         >
-        <el-button size="large" type="primary" round @click="this.readWord"
+        <!--<el-button size="large" type="primary" round @click="this.readWord"
           >发音</el-button
-        >
+        >-->
         <el-button
           size="large"
           type="primary"
@@ -209,6 +209,6 @@ li {
   font-size: 30px;
 }
 .textColor{
-  color: red;
+  color: black;
 }
 </style>
