@@ -38,7 +38,7 @@
           <div class="card-center" v-if="this.curr >= 0">
             <span v-if="this.value" class="value" :class="{ 'textColor': this.word != this.list[this.randoms[this.curr]].value}">{{ this.list[this.randoms[this.curr]].value }}</span>
             <span v-if="this.value" class="desc" :class="{ 'textColor': this.word != this.list[this.randoms[this.curr]].value}">{{ this.list[this.randoms[this.curr]].desc }}</span>
-            <!--<el-input v-if="!this.value" v-model="word" size="large"/>-->
+            <el-input v-if="!this.value" v-model="word" size="large"/>
           </div>
         </el-card>
       </div>
@@ -70,12 +70,15 @@
     </el-main>
   </el-container>
   <el-dialog v-model="input">
+    <h3 class="title">{{this.title[0]}} : {{this.title[1]}} : {{this.title[2]}}</h3>
     <el-input v-model="text" :rows="8" type="textarea" />
     <div class="butList" style="padding-top: 20px">
       <el-button type="primary" round @click="this.input = false"
         >取消</el-button
       >
-      <el-button type="primary" round @click="this.submit">确认</el-button>
+      <el-button type="primary" round @click="this.submit()">确认</el-button>
+      <el-button type="primary" round @click="this.swap(0, 1)">A&lt;-&gt;B</el-button>
+      <el-button type="primary" round @click="this.swap(1, 2)">B&lt;-&gt;C</el-button>
     </div>
   </el-dialog>
 </template>
@@ -91,7 +94,9 @@ export default {
       input: false,
       curr: -1,
       text: "",
-      word: ""
+      word: "",
+      order:[0,1,2],
+      title:["name", "value", "desc"]
     };
   },
   methods: {
@@ -120,13 +125,20 @@ export default {
     random(length) {
       this.randoms = [...Array(length).keys()].sort(() => Math.random() - 0.5);
     },
+    swap(a, b) {
+      this.order[a] = this.order[b];
+      this.order[b] = 3 - this.order[a] - this.order[3 - a - b];
+      let temp = this.title[a];
+      this.title[a] = this.title[b];
+      this.title[b] = temp;
+    },
     submit() {
       let temp = this.text.split("\n");
       this.random(temp.length);
       this.list = [];
       for (var i = 0; i < temp.length; i++) {
         let peer = temp[i].split("\t");
-        this.list.push({ name: peer[0], value: peer[1], desc: peer[2] });
+        this.list.push({ name: peer[this.order[0]], value: peer[this.order[1]], desc: peer[this.order[2]] });
       }
       this.curr = 0;
       this.aside = false;
@@ -199,6 +211,10 @@ li {
   align-items: center;
   flex-direction: column;
 }
+.title {
+  width: 100%;
+  text-align: center;
+}
 .name {
   font-size: 60px;
 }
@@ -209,6 +225,6 @@ li {
   font-size: 30px;
 }
 .textColor{
-  color: black;
+  color: rgb(240, 117, 117);
 }
 </style>
