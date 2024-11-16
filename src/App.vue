@@ -11,12 +11,11 @@
         <el-card class="card">
           <template #header>
             <div class="card-center" v-if="this.curr >= 0">
-              <span class="name">{{ this.list[this.randoms[this.curr]] }}</span>
+              <span class="name"  @click="readWord">{{ this.list[this.randoms[this.curr]] }}</span>
             </div>
           </template>
-          <div class="card-center" v-if="this.curr >= 0">
-            <span v-if="this.value" class="value" @click="readWord">{{this.chinese}}</span>
-            <span v-if="this.value" class="desc" @click="readWord"></span>
+          <div class="card-center" v-if="this.curr >= 0 && this.value">
+            <span v-for="(item, index) in transform" :key="index" class="value" @click="readWord">{{item}}</span>
           </div>
         </el-card>
       </div>
@@ -35,12 +34,12 @@ import {
 } from '@element-plus/icons-vue'
 </script>
 <script>
+import axios from '@/axios'; // 引入你创建的axios实例
 export default {
   data() {
     return {
       list: [],
-      chinese: null,
-      sentences: null,
+      chinese: "",
       randoms: [],
       aside: true,
       value: false,
@@ -77,7 +76,15 @@ export default {
     randomList(length) {
       this.randoms = [...Array(length).keys()].sort(() => Math.random() - 0.5);
     },
-    show() {
+    async show() {
+      try {
+        if (this.chinese.length == 0) {
+          const response = await axios.get('/transform/' + this.list[this.randoms[this.curr]]); // 发送GET请求
+          this.chinese = await response.data
+        }
+      } catch (error) {
+          console.error('Fetch error:', error);
+      }
       this.value = !this.value;
     },
     loadWords(event) {
@@ -150,10 +157,6 @@ li {
 }
 
 .value {
-  font-size: 45px;
-}
-
-.desc {
-  font-size: 30px;
+  font-size: 25px;
 }
 </style>
