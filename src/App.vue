@@ -1,6 +1,6 @@
 <template>
   <el-container class="common-layout">
-    <el-aside v-if="this.aside" width="60px">
+    <el-aside v-if="aside" width="60px">
       <div class="aside">
         <el-button size="large" type="primary" :icon="Select" circle @click="triggerLoadWords"/>
        <input ref="wordFileInput" type="file" @change="loadWords" v-show="false"/>
@@ -10,20 +10,21 @@
       <div class="main">
         <el-card class="card">
           <template #header>
-            <div class="card-center" v-if="this.curr >= 0">
-              <span class="name"  @click="readWord">{{ this.list[this.randoms[this.curr]] }}</span>
+            <div class="card-center" v-if="curr >= 0">
+              <span class="engilsh"  @click="readWord">{{ list[randoms[curr]] }}</span>
             </div>
           </template>
-          <div class="card-center" v-if="this.curr >= 0 && this.value">
-            <span v-for="(item, index) in transform" :key="index" class="value" @click="readWord">{{item}}</span>
+          <div class="card-center" v-if="curr >= 0 && value">
+            <span class="chinese">{{chinese}}</span>
+            <span v-for="(item, index) in sentences" :key="index" class="sentence">{{index}}. <span @click="readWord">{{item}}</span></span>
           </div>
         </el-card>
       </div>
       <div class="butList">
-        <el-button size="large" type="primary" round @click="this.preWord">上一个</el-button>
-        <el-button size="large" type="primary" round @click="this.show">显示</el-button>
-        <el-button size="large" type="primary" round @click="this.nextWord">会</el-button>
-        <el-button size="large" type="primary" round @click="this.nextWord">不会</el-button>
+        <el-button size="large" type="primary" round @click="preWord">上一个</el-button>
+        <el-button size="large" type="primary" round @click="show">显示</el-button>
+        <el-button size="large" type="primary" round @click="nextWord">会</el-button>
+        <el-button size="large" type="primary" round @click="nextWord">不会</el-button>
       </div>
     </el-main>
   </el-container>
@@ -34,12 +35,14 @@ import {
 } from '@element-plus/icons-vue'
 </script>
 <script>
-import axios from '@/axios'; // 引入你创建的axios实例
+import dictAxios from '@/dictAxios';
+import myAxios from '@/myAxios';
 export default {
   data() {
     return {
       list: [],
       chinese: "",
+      sentences: [],
       randoms: [],
       aside: true,
       value: false,
@@ -47,6 +50,7 @@ export default {
       filterFile: null,
       needFilter: null,
       curr: -1,
+      speaker: null
     };
   },
   methods: {
@@ -66,9 +70,9 @@ export default {
       const content = event.target.textContent;
       var word = new SpeechSynthesisUtterance(content);
       word.lang = "en-US";
-      var voices = window.speechSynthesis.getVoices();
-      word.voice = voices[13];
-      word.rate = 1.1 //播放语速 （默认值是1，范围是0.1到10，表示语速的倍数，例如2表示正常语速的两倍）
+      //var voices = window.speechSynthesis.getVoices();
+      //word.voice = voices[13];
+      word.rate = 1 //播放语速 （默认值是1，范围是0.1到10，表示语速的倍数，例如2表示正常语速的两倍）
       word.pitch = 1 //音调高低 （范围从0（最小）到2（最大）。默认值为1）
       //word.volume = 0.5 //播放音量 (区间范围是0到1，默认是1)
       window.speechSynthesis.speak(word);
@@ -78,9 +82,23 @@ export default {
     },
     async show() {
       try {
+        const word = this.list[this.randoms[this.curr]]
         if (this.chinese.length == 0) {
-          const response = await axios.get('/transform/' + this.list[this.randoms[this.curr]]); // 发送GET请求
+          const response = await myAxios.get('/transform/' + word); // 发送GET请求
           this.chinese = await response.data
+        }
+        if (this.sentences.length == 0) {
+          const response = await dictAxios.get('/api/v2/entries/en/' + word)
+          const datas = await response.data
+          for (const data of datas) {
+            for (const meaning of data.meanings) {
+              for (const definition of meaning.definitions) {
+                if (definition.example) {
+                  this.sentences.push(definition.example)
+                }
+              }
+            }
+          }
         }
       } catch (error) {
           console.error('Fetch error:', error);
@@ -152,11 +170,16 @@ li {
   flex-direction: column;
 }
 
-.name {
+.engilsh {
   font-size: 60px;
 }
 
-.value {
+.chinese {
+  font-size: 45px;
+}
+
+.sentence {
+  width: 100%;
   font-size: 25px;
 }
 </style>
